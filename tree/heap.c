@@ -1,11 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 
 #include "data.h"
 #include "heap.h"
 
 int main(){
+    _data d;
+    d.n = 10;
+
+    _heap *h;
+    h = heap_init(&d);
+
+    heap_prealloc(h, 5);
+
     return EXIT_SUCCESS;
 }
 
@@ -16,14 +24,69 @@ int main(){
 _heap *heap_init(void *data){
     _heap *h = (_heap*) malloc (sizeof(_heap));
 
-    h->last = NULL;
-    h->left = NULL;
+    h->last  = NULL;
+    h->left  = NULL;
     h->right = NULL;
-    h->top = NULL;
+    h->top   = NULL;
+    h->levels= 1;
+    h->nitens= 1;
+    h->nitens= 1;
+    h->free_pos=0;
 
+    h->data = (_data*) malloc (sizeof(_data));
     memcpy(h->data, data, sizeof(_data));
 
     return h;
+}
+
+/*
+ * Preallocates n lvls for the heap
+ */
+void heap_prealloc(_heap *h, int n){
+    int i;
+    for (i=0 ; i<n ; i++){
+        heap_prealloc1(h);
+    }
+}
+
+/*
+ * Preallocates 1 lvl for the heap
+ */
+void heap_prealloc1(_heap *h){
+    if( h->left != NULL || h->right !=NULL){
+        if ( h -> right != NULL){
+            heap_prealloc1(h->right);
+        }
+
+        if ( h -> left != NULL){
+            heap_prealloc1(h->left);
+        }
+    } else {
+        if (h->left == NULL){
+            _heap *t;
+            t = (_heap*) malloc (sizeof(_heap));
+            t->right = NULL;
+            t->left  = NULL;
+            t->top   = h;
+            t->last  = h->last;
+        }
+
+        if (h->right == NULL){
+            _heap *t;
+            t = (_heap*) malloc (sizeof(_heap));
+            t->right = NULL;
+            t->left  = NULL;
+            t->top   = h;
+            t->last  = h->last;
+        }
+
+        _heap *x = h;
+        while(x->top != NULL){
+            x = x->top;
+        }
+        x->levels++;
+        x->nitens_max += 2^(x->levels);
+    }
 }
 
 /*
