@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "queue.h"
 
 int queue_is_empty(_queue *q){

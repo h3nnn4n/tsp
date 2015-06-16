@@ -1,6 +1,16 @@
 #ifndef __QUEUE
 #define __QUEUE
 
+typedef struct __list {
+    struct __list *next;
+    int n;
+} _list;
+
+typedef struct __restricao {
+    struct __restricao *next;
+    int i, j;
+} _restricao;
+
 typedef struct {
 	int size;
 	struct __queue_n *start;
@@ -13,16 +23,6 @@ typedef struct __queue_n {
     _restricao *restricao;
     _list *used, *not_used;
 } _queue_n;
-
-typedef struct __list {
-    struct __list next;
-    int n;
-} _list;
-
-typedef struct __restricao {
-    struct __restricao *next;
-    int i, j;
-} _restricao;
 
 _queue* queue_init();
 void queue_insert(_queue *, int);
