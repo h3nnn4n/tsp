@@ -111,32 +111,50 @@ void restricao_insert(_restricao *res, int a, int b){
 _queue* branch(_restricao *res, int **tsp, int n, int a){
     _queue* q = queue_init();
 
-
+    return q;
 }
 
 int relax(_restricao *r, int **tsp, int n, int a){
     int i, j;
     int min;
     int total;
-    _restricao *aux = r;
+    _restricao *aux;
 
     total = 0;
 
     for (i=0; i<n; i++){
-        min = 0;
-        for (j=0; j<n; j++){
-            if (tsp[i][j] < min){
-                min = tsp[i][j];
+
+        aux = r;
+
+        while (aux != NULL){
+            if (aux->s == i){
+                break;
             }
+
+            aux = aux->next;
+            printf("%p %p \n", aux, aux->next);
         }
+
+        if (aux == NULL){
+            min = 9990;
+            for (j=0; j<n; j++){
+                if (tsp[i][j] < min && i != j){
+                    min = tsp[i][j];
+                }
+            }
+        } else {
+            min = tsp[aux->s][aux->t];
+        }
+
         total += min;
     }
 
-    return min;
+    return total;
 }
 
 int is_a_restriction(_restricao *r){
 
+    return 1;
 }
 
 int is_a_cycle(_restricao *r){
@@ -148,9 +166,13 @@ int is_a_cycle(_restricao *r){
     while (a != NULL){
         b = a->next;
         while(b != NULL){
+            //printf("->  %d %d %d %d\n",a->s, a->t, b->s, b->t);
+
+            // tests 4 cases in which the branching is illegal for the tsp
+
             if ((a->s == b->s && a->t == b->t) ||
-                (a->t == b->s && a->s == b->t) ||
-                (a->s == b->t && a->t == b->s) ||
+                (a->t == a->s || b->s == b->t) ||
+                (a->s == b->t || a->t == b->t) ||
                 (a->t == b->t && a->s == b->s)){
 
                 return 1;
@@ -158,6 +180,7 @@ int is_a_cycle(_restricao *r){
 
             b = b->next;
         }
+        a = a->next;
     }
 
     return 0;

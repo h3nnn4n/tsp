@@ -34,4 +34,7 @@ int  queue_is_empty(_queue *);
 _restricao* restricao_init(int, int);
 void restricao_insert(_restricao *, int, int);
 
+int  is_a_cycle(_restricao *);
+int  relax(_restricao *r, int **tsp, int n, int a);
+
 #endif /* __QUEUE  */

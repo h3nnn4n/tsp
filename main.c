@@ -12,8 +12,6 @@ int main(){
     int i, j;
     int n;
 
-    //n = 5;
-
     scanf("%d", &n);
 
     tsp = (int**) malloc (sizeof(int*)*n);
@@ -42,9 +40,14 @@ int main(){
 
     _restricao *r;
     r = restricao_init(1, 2);
-    restricao_insert(r, 2, 3);
+    //restricao_insert(r, 2, 3);
+    //restricao_insert(r, 3, 4);
+    //restricao_insert(r, 4, 2);
 
-    printf("%d %d %d %d\n", r->s, r->t, r->next->s, r->next->t);
+    //printf("\n%d %d %d %d\n", r->s, r->t, r->next->s, r->next->t);
+    printf("%d\n", is_a_cycle(r));
+
+    printf("\n%d \n", relax(r, tsp, n, 0));
 
     return EXIT_SUCCESS;
 }
