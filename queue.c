@@ -82,3 +82,83 @@ int queue_remove(_queue *q){
     free(tmp);
     return n;
 }
+
+_restricao* restricao_init(int a, int b){
+//void restricao_init(_queue *q, int a, int b){
+    _restricao *res = (_restricao*) malloc (sizeof(_restricao));
+
+    res->next = NULL;
+    res->s = a;
+    res->t = b;
+
+    return res;
+}
+
+void restricao_insert(_restricao *res, int a, int b){
+    _restricao *n = (_restricao*) malloc (sizeof(_restricao));
+
+    _restricao *aux = res;
+
+    while (aux->next != NULL){
+        aux = aux->next;
+    }
+
+    aux->next = n;
+    n->s = a;
+    n->t = b;
+}
+
+_queue* branch(_restricao *res, int **tsp, int n, int a){
+    _queue* q = queue_init();
+
+
+}
+
+int relax(_restricao *r, int **tsp, int n, int a){
+    int i, j;
+    int min;
+    int total;
+    _restricao *aux = r;
+
+    total = 0;
+
+    for (i=0; i<n; i++){
+        min = 0;
+        for (j=0; j<n; j++){
+            if (tsp[i][j] < min){
+                min = tsp[i][j];
+            }
+        }
+        total += min;
+    }
+
+    return min;
+}
+
+int is_a_restriction(_restricao *r){
+
+}
+
+int is_a_cycle(_restricao *r){
+    _restricao *a;
+    _restricao *b;
+
+    a = r;
+
+    while (a != NULL){
+        b = a->next;
+        while(b != NULL){
+            if ((a->s == b->s && a->t == b->t) ||
+                (a->t == b->s && a->s == b->t) ||
+                (a->s == b->t && a->t == b->s) ||
+                (a->t == b->t && a->s == b->s)){
+
+                return 1;
+            }
+
+            b = b->next;
+        }
+    }
+
+    return 0;
+}

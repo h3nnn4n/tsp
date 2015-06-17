@@ -8,7 +8,7 @@ typedef struct __list {
 
 typedef struct __restricao {
     struct __restricao *next;
-    int i, j;
+    int s, t;
 } _restricao;
 
 typedef struct {
@@ -26,9 +26,12 @@ typedef struct __queue_n {
 
 _queue* queue_init();
 void queue_insert(_queue *, int);
-int queue_remove(_queue *);
+int  queue_remove(_queue *);
 void queue_print(_queue *);
 
-int queue_is_empty(_queue *);
+int  queue_is_empty(_queue *);
+
+_restricao* restricao_init(int, int);
+void restricao_insert(_restricao *, int, int);
 
 #endif /* __QUEUE  */
