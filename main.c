@@ -39,10 +39,9 @@ int main(){
     queue_insert(q, 0);
 
     _restricao *r;
-    r = restricao_init(1, 2);
-    //restricao_insert(r, 2, 3);
-    //restricao_insert(r, 3, 4);
-    //restricao_insert(r, 4, 2);
+    r = restricao_init(1, 4);
+    restricao_insert(r, 2, 5);
+    restricao_insert(r, 3, 4);
 
     //printf("\n%d %d %d %d\n", r->s, r->t, r->next->s, r->next->t);
     printf("%d\n", is_a_cycle(r));

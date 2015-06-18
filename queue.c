@@ -84,7 +84,6 @@ int queue_remove(_queue *q){
 }
 
 _restricao* restricao_init(int a, int b){
-//void restricao_init(_queue *q, int a, int b){
     _restricao *res = (_restricao*) malloc (sizeof(_restricao));
 
     res->next = NULL;
@@ -108,12 +107,15 @@ void restricao_insert(_restricao *res, int a, int b){
     n->t = b;
 }
 
+// Branches the tree
 _queue* branch(_restricao *res, int **tsp, int n, int a){
     _queue* q = queue_init();
 
     return q;
 }
 
+// Given a matrix of costs and a list with restrictions
+// return the relaxation value
 int relax(_restricao *r, int **tsp, int n, int a){
     int i, j;
     int min;
@@ -127,12 +129,12 @@ int relax(_restricao *r, int **tsp, int n, int a){
         aux = r;
 
         while (aux != NULL){
-            if (aux->s == i){
+            if (aux->s == i+1){
                 break;
             }
 
+            printf("%p %p %d -> %d %d\n", aux, aux->next, i, aux->s, aux->t);
             aux = aux->next;
-            printf("%p %p \n", aux, aux->next);
         }
 
         if (aux == NULL){
@@ -143,7 +145,8 @@ int relax(_restricao *r, int **tsp, int n, int a){
                 }
             }
         } else {
-            min = tsp[aux->s][aux->t];
+            printf("Match\n");
+            min = tsp[aux->s-1][aux->t-1];
         }
 
         total += min;
@@ -157,6 +160,7 @@ int is_a_restriction(_restricao *r){
     return 1;
 }
 
+// Detects if there is a cycle in the restrictions (There should not be one)
 int is_a_cycle(_restricao *r){
     _restricao *a;
     _restricao *b;
@@ -166,10 +170,6 @@ int is_a_cycle(_restricao *r){
     while (a != NULL){
         b = a->next;
         while(b != NULL){
-            //printf("->  %d %d %d %d\n",a->s, a->t, b->s, b->t);
-
-            // tests 4 cases in which the branching is illegal for the tsp
-
             if ((a->s == b->s && a->t == b->t) ||
                 (a->t == a->s || b->s == b->t) ||
                 (a->s == b->t || a->t == b->t) ||
