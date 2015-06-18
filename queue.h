@@ -33,8 +33,10 @@ int  queue_is_empty(_queue *);
 
 _restricao* restricao_init(int, int);
 void restricao_insert(_restricao *, int, int);
+void restricao_pop(_restricao *);
 
 int  is_a_cycle(_restricao *);
 int  relax(_restricao *r, int **tsp, int n, int a);
+_queue* branch(_restricao *res, int **tsp, int n, int a);
 
 #endif /* __QUEUE  */

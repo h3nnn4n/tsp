@@ -33,20 +33,19 @@ int main(){
         puts("");
     }
 
-    q = queue_init();
-    queue_insert(q, 0);
-    queue_insert(q, 0);
-    queue_insert(q, 0);
-
     _restricao *r;
-    r = restricao_init(1, 4);
+    r = restricao_init(1, 3);
     restricao_insert(r, 2, 5);
-    restricao_insert(r, 3, 4);
 
     //printf("\n%d %d %d %d\n", r->s, r->t, r->next->s, r->next->t);
-    printf("%d\n", is_a_cycle(r));
+    //printf("%d\n", is_a_cycle(r));
 
-    printf("\n%d \n", relax(r, tsp, n, 0));
+    //printf("\n%d \n", relax(r, tsp, n, 0));
+
+    q = branch(r, tsp, 5, 3); 
+
+    puts("-------");
+    queue_print(q);
 
     return EXIT_SUCCESS;
 }

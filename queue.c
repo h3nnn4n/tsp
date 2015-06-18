@@ -57,12 +57,20 @@ void queue_insert(_queue *q, int n){
     q->size++;
 }
 
+void restricao_print(_restricao *q){
+    _restricao *aux = q;
+
+    while(aux != NULL){
+        printf("%d %d\n", aux->s, aux->t);
+        aux = aux->next;
+    }
+}
+
 void queue_print(_queue *q){
     _queue_n *aux = q->start;
 
     while(aux != NULL){
         printf("%d %p %p\n", aux->n, aux, aux->next);
-
         aux = aux->next;
     }
 }
@@ -107,9 +115,39 @@ void restricao_insert(_restricao *res, int a, int b){
     n->t = b;
 }
 
+void restricao_pop(_restricao *res){
+    _restricao *aux;
+    _restricao *old;
+
+    aux = res;
+
+    while(aux->next != NULL){
+        old = aux;
+        aux = aux->next;
+    }
+
+    free(aux);
+    old->next = NULL;
+}
+
 // Branches the tree
 _queue* branch(_restricao *res, int **tsp, int n, int a){
     _queue* q = queue_init();
+
+    int i;
+
+    for (i=1; i<=n; i++){
+       restricao_insert(res, a, i); 
+       if (is_a_cycle(res)){
+           restricao_pop(res);
+       } else {
+           //puts("-------");
+           //restricao_print(res);
+
+           queue_insert(q, relax(res, tsp, n, a));
+           restricao_pop(res);
+       }
+    }
 
     return q;
 }
@@ -124,6 +162,10 @@ int relax(_restricao *r, int **tsp, int n, int a){
 
     total = 0;
 
+    puts("restricoes:");
+    restricao_print(r);
+    puts("");
+
     for (i=0; i<n; i++){
 
         aux = r;
@@ -133,7 +175,7 @@ int relax(_restricao *r, int **tsp, int n, int a){
                 break;
             }
 
-            printf("%p %p %d -> %d %d\n", aux, aux->next, i, aux->s, aux->t);
+            //printf("%p %p %d -> %d %d\n", aux, aux->next, i, aux->s, aux->t);
             aux = aux->next;
         }
 
@@ -145,12 +187,16 @@ int relax(_restricao *r, int **tsp, int n, int a){
                 }
             }
         } else {
-            printf("Match\n");
+            //printf("Match\n");
             min = tsp[aux->s-1][aux->t-1];
         }
 
+        printf("%d ", min);
+
         total += min;
     }
+
+    printf("\n%d\n", total);
 
     return total;
 }
@@ -164,22 +210,26 @@ int is_a_restriction(_restricao *r){
 int is_a_cycle(_restricao *r){
     _restricao *a;
     _restricao *b;
+    
+    int first = 0;
 
     a = r;
 
     while (a != NULL){
         b = a->next;
         while(b != NULL){
-            if ((a->s == b->s && a->t == b->t) ||
-                (a->t == a->s || b->s == b->t) ||
-                (a->s == b->t || a->t == b->t) ||
-                (a->t == b->t && a->s == b->s)){
+            if (( a->s == b->s && a->t == b->t) || /* vertice igual */
+                ( a->t == a->s || b->s == b->t) || /* self  loop */
+                ( a->s == b->t && first>0)      || /* */
+                ( a->t == b->t )                || /* */
+                ( a->t == b->t && a->s == b->s)){  /* redundante */
 
                 return 1;
             }
 
             b = b->next;
         }
+        first++;
         a = a->next;
     }
 
