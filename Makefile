@@ -5,3 +5,6 @@ all: queue_test
 
 queue_test:
 	$(CC) $(CFLAGS) queue.c main.c -o queue
+
+clean:
+	rm queue
