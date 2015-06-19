@@ -129,6 +129,7 @@ _queue* queue_merge(_queue *a, _queue *b){
     while (auxa != NULL && auxb != NULL){
         if (auxa->n < auxb->n){
             if (flag) {
+                flag--;
                 q->start = auxa;
                 aux = q->start;
             } else {
@@ -138,6 +139,7 @@ _queue* queue_merge(_queue *a, _queue *b){
             auxa = auxa->next;
         } else {
             if (flag) {
+                flag--;
                 q->start = auxb;
                 aux = q->start;
             } else {

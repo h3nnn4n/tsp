@@ -35,20 +35,29 @@ int main(){
 
     q = queue_init();
     queue_insert(q, 1);
-    queue_insert(q, 2);
+    queue_insert(q, 3);
     queue_insert(q, 5);
-    queue_insert(q, 2);
-    queue_insert(q, 9);
     queue_insert(q, 7);
+    queue_insert(q, 9);
+
+    puts("\n----------------------");
+    queue_print(q);
+    puts("\n----------------------");
 
     _queue *a = queue_init();
-    queue_insert(a, 3);
+    queue_insert(a, 2);
     queue_insert(a, 4);
     queue_insert(a, 6);
+    queue_insert(a, 8);
     queue_insert(a, 10);
 
+    queue_print(a);
     q = queue_merge(q, a);
+
+    puts("\n----------------------");
+
     queue_print(q);
+    puts("\n----------------------");
 
     return EXIT_SUCCESS;
     _restricao *r;
