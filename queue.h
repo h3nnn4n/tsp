@@ -20,23 +20,28 @@ typedef struct {
 typedef struct __queue_n {
 	struct __queue_n *next;
     int n;
+    int limite;
+    int atual;
     _restricao *restricao;
     _list *used, *not_used;
 } _queue_n;
 
-_queue* queue_init();
-void queue_insert(_queue *, int);
-int  queue_remove(_queue *);
-void queue_print(_queue *);
-
-int  queue_is_empty(_queue *);
+_queue_n *queue_poke(_queue *q);
+_queue_n *queue_pop(_queue *q);
+_queue*   queue_init();
+_queue*   queue_merge(_queue *a, _queue *b);
+void      queue_insert(_queue *, int);
+void      queue_print(_queue *);
+int       queue_remove(_queue *);
+int       queue_is_empty(_queue *);
 
 _restricao* restricao_init(int, int);
-void restricao_insert(_restricao *, int, int);
-void restricao_pop(_restricao *);
+_restricao* restricao_copy(_restricao *r);
+void        restricao_insert(_restricao *, int, int);
+void        restricao_pop(_restricao *);
 
-int  is_a_cycle(_restricao *);
-int  relax(_restricao *r, int **tsp, int n, int a);
+int     is_a_cycle(_restricao *);
+int     relax(_restricao *r, int **tsp, int n, int a);
 _queue* branch(_restricao *res, int **tsp, int n, int a);
 
 #endif /* __QUEUE  */

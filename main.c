@@ -33,19 +33,38 @@ int main(){
         puts("");
     }
 
-    _restricao *r;
-    r = restricao_init(1, 3);
-    restricao_insert(r, 2, 5);
+    q = queue_init();
+    queue_insert(q, 1);
+    queue_insert(q, 2);
+    queue_insert(q, 5);
+    queue_insert(q, 2);
+    queue_insert(q, 9);
+    queue_insert(q, 7);
 
-    //printf("\n%d %d %d %d\n", r->s, r->t, r->next->s, r->next->t);
-    //printf("%d\n", is_a_cycle(r));
+    _queue *a = queue_init();
+    queue_insert(a, 3);
+    queue_insert(a, 4);
+    queue_insert(a, 6);
+    queue_insert(a, 10);
 
-    //printf("\n%d \n", relax(r, tsp, n, 0));
-
-    q = branch(r, tsp, 5, 3); 
-
-    puts("-------");
+    q = queue_merge(q, a);
     queue_print(q);
+
+    return EXIT_SUCCESS;
+    _restricao *r;
+    r = restricao_init(-1, -1);
+
+    q = branch(r, tsp, 5, 2); 
+    queue_print(q);
+
+    for (i=3; i<n; i++){
+        puts("\n--- NEW ------------------");
+
+        _queue *q2 = branch(r, tsp, 5, i);
+
+        q = queue_merge(q, q2);
+        queue_print(q);
+    }
 
     return EXIT_SUCCESS;
 }
