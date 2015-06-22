@@ -21,8 +21,10 @@ _queue* queue_init(){
     return head;
 }
 
-void queue_insert(_queue *q, int n){
+//void queue_insert(_queue *q, int n){
+_queue_n *queue_insert(_queue *q, int n){
     _queue_n *node = (_queue_n*) malloc (sizeof(_queue_n));
+
     if (node == NULL){
         fprintf(stderr,"Malloc problems!\n");
     }
@@ -61,9 +63,12 @@ void queue_insert(_queue *q, int n){
                 q->end = node;
             }
         }
+
     }
 
     q->size++;
+
+    return node;
 }
 
 void restricao_print(_restricao *q){
@@ -245,15 +250,16 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
 
     int i;
 
-    //printf(" Branching for %d with %d\n", a, );
-
     for (i=1; i<=n; i++){
-        //printf("%d %d ", a, i);
+        //printf(" try %d %d ", a, i);
 
-        if (i == a)
+        if (i == a) {
             continue;
+        }
 
+        //printf("branch:  %d %d\n", a, i);
         restricao_insert(res, a, i); 
+
         if (is_a_cycle(res)){
             //printf(" is a cycle\n");
             restricao_pop(res);
@@ -262,13 +268,15 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
                 puts("\n-------");
             //restricao_print(res);
 
-            queue_insert(q, relax(res, tsp, n, a));
+            int val = relax(res, tsp, n, a);
+            //printf("val = %d\n", val);
+            _queue_n *aux = queue_insert(q, val);
 
-            _queue_n* aux = queue_poke(q);
+            //_queue_n* aux = queue_poke(q);
             aux->restricao = restricao_copy(res);
 
             if (aux->atual == -1){
-                aux->atual = 2;
+                aux->atual = 1;
             } else {
                 aux->atual = aux->atual+1;
             }
@@ -276,6 +284,10 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
             restricao_pop(res);
         }
     }
+
+    //puts(" ==== QUEUE ==== ");
+    //queue_print(q);
+    //puts(" ==== QUEUE ==== ");
 
     return q;
 }
@@ -357,16 +369,22 @@ _restricao* restricao_copy(_restricao *r){
     _restricao *n;
 
     n = restricao_init(r->s, r->t);
+    //printf("\n-----------------\n Copying | %d %d", r->s, r->t);
 
     while (aux->next != NULL){
         aux = aux->next;
+        //printf(" | %d %d", r->s, r->t);
         restricao_insert(n, aux->s, aux->t);
     }
+    
+    //puts("");
 
     return n;
 }
 
 int is_a_restriction(_restricao *r){
+    // TODO 
+    // wtf is this?
 
     return 1;
 }
@@ -374,12 +392,12 @@ int is_a_restriction(_restricao *r){
 // Detects if there is a cycle in the restrictions (There should not be one)
 int is_a_cycle(_restricao *r){
     _restricao *a;
-    //_restricao *b;
+    _restricao *b;
 
     int i, j;
     int count;
     int n = 5;
-    //int first = 0;
+    int first = 0;
 
     int *adj = (int*) malloc (sizeof(int) * n * n);
 
@@ -427,36 +445,36 @@ int is_a_cycle(_restricao *r){
         }
     }
 
-    //a = r;
+    a = r;
 
-    //if (a->s == -1 && a->t == -1){
-        //a = a->next;
-    //}
+    if (a->s == -1 && a->t == -1){
+        a = a->next;
+    }
 
-    //while (a != NULL){
-        //if (a->next != NULL){
-            //b = a->next;
-        //} else {
-            //break;
-        //}
+    while (a != NULL){
+        if (a->next != NULL){
+            b = a->next;
+        } else {
+            break;
+        }
 
-        ////printf("%p %p %d %d %d %d\n", a, b, a->s, a->t, b->s, b->t);
-        //while(b != NULL){
-            //if (( a->s == b->s && a->t == b->t) || [> vertice igual <]
-                //( a->t == a->s || b->s == b->t) || [> self  loop <]
+        //printf("%p %p %d %d %d %d\n", a, b, a->s, a->t, b->s, b->t);
+        while(b != NULL){
+            if (( a->s == b->s && a->t == b->t) || /* vertice igual */
+                ( a->t == a->s || b->s == b->t) || /* self  loop */
                 //( a->s == b->t && first>0)      || [> <]
                 //( a->t == b->t )                || [> <]
-                ////( a->s == b->s )                || [> <]
-                //( a->t == b->s && a->s == b->t)){  [> loop <]
+                //( a->s == b->s )                || [> <]
+                ( a->t == b->s && a->s == b->t)){  /* loop */
 
-                //return 1;
-            //}
+                return 1;
+            }
 
-            //b = b->next;
-        //}
-        //first++;
-        //a = a->next;
-    //}
+            b = b->next;
+        }
+        first++;
+        a = a->next;
+    }
 
     return 0;
 }

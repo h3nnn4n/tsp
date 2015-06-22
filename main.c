@@ -58,24 +58,23 @@ int main(){
         //if (queue_is_empty(q) != 0) {
         _queue_n *pp = queue_poke(q); 
 
-        printf("==> Branching %d %d\n", pp->atual, pp->n);
+        printf("==> Branching for %d with %d\n", pp->atual, pp->n);
 
         _queue *q2 = branch((queue_poke(q))->restricao, tsp, n, (queue_poke(q))->atual+1);
+
+        if (q2->start == NULL) {
+            //puts("Imminent beating to a pulp");
+            queue_remove(q);
+        } else {
+            queue_remove(q);
+            q = queue_merge(q, q2);
+        }
+
         size2 = q2->size;
-
-        puts(" ==== QUEUE ==== ");
-        queue_print(q2);
-        puts(" ==== QUEUE ==== ");
-
-        queue_remove(q);
-        q = queue_merge(q, q2);
-        //}
-        
+            
         printf("XXXXx %d %d %d ----\n", q->size, size2, size);
         
-
         queue_print(q);
-        //printf("========= = = =  =  %d %d\n", q->size, queue_is_empty(q));
     }
 
     return EXIT_SUCCESS;
