@@ -9,8 +9,8 @@ int master_of_puppets = 1;
 
 int queue_is_empty(_queue *q){
     if ( q->size == 0 )
-        return 0;
-    return 1;
+        return 1;
+    return 0;
 }
 
 _queue* queue_init(){
@@ -83,7 +83,21 @@ void queue_print(_queue *q){
     while(aux != NULL){
         //printf("\n%d %p %p\n-----\n", aux->n, aux, aux->next);
         //printf("%d %p %p\n", aux->n, aux, aux->next);
-        printf("%d\n", aux->n);
+        printf("%d  |", aux->n);
+
+        _restricao *r = aux->restricao;
+        
+        while (r != NULL){
+            if (r->s == -1 && r->t == -1){
+                r = r->next;
+            }
+
+            printf(" %d %d |", r->s, r->t);
+            r = r->next;
+        }
+
+        puts("");
+
         //restricao_print(aux->restricao);
         aux = aux->next;
     }
@@ -124,64 +138,66 @@ _queue_n *queue_pop(_queue *q){
 }
 
 _queue* queue_merge(_queue *a, _queue *b){
-    _queue *q = queue_init();
-    _queue_n *aux, *auxa, *auxb;
-
     if (a == NULL){
         return b;
     } else if (b == NULL) {
         return a;
-    }
+    } else {
+        _queue *q = queue_init();
+        _queue_n *aux, *auxa, *auxb;
 
-    int flag = 1;
+        int flag = 1;
+        q->size = a->size + b->size;
 
-    auxa = a->start;
-    auxb = b->start;
+        auxa = a->start;
+        auxb = b->start;
 
-    while (auxa != NULL && auxb != NULL){
-        if (auxa->n < auxb->n){
-            if (flag) {
-                flag--;
-                q->start = auxa;
-                aux = q->start;
+        while (auxa != NULL && auxb != NULL){
+            if (auxa->n < auxb->n){
+                if (flag) {
+                    flag--;
+                    q->start = auxa;
+                    aux = q->start;
+                } else {
+                    aux->next = auxa;
+                    aux = aux->next;
+                }
+                auxa = auxa->next;
             } else {
-                aux->next = auxa;
-                aux = aux->next;
+                if (flag) {
+                    flag--;
+                    q->start = auxb;
+                    aux = q->start;
+                } else {
+                    aux->next = auxb;
+                    aux = aux->next;
+                }
+                auxb = auxb->next;
             }
-            auxa = auxa->next;
-        } else {
-            if (flag) {
-                flag--;
-                q->start = auxb;
-                aux = q->start;
-            } else {
-                aux->next = auxb;
-                aux = aux->next;
-            }
-            auxb = auxb->next;
-        }
-    }
-
-    if (auxa != NULL && aux != NULL){ 
-        aux->next = auxa;
-    }
-
-    if (auxb != NULL){
-        aux->next = auxb;
-    }
-
-    _queue_n *aux3 = q->start;
-
-    if (aux3 != NULL){
-
-        while (aux3->next != NULL){
-            aux3 = aux3->next;
         }
 
-        q->end = aux3;
-    }
+        if (auxa != NULL && aux != NULL){ 
+            aux->next = auxa;
+        }
 
-    return q;
+        if (auxb != NULL){
+            aux->next = auxb;
+        }
+
+        _queue_n *aux3 = q->start;
+
+        if (aux3 != NULL){
+
+            while (aux3->next != NULL){
+                aux3 = aux3->next;
+            }
+
+            q->end = aux3;
+        }
+
+
+        return q;
+    }
 }
 
 _restricao* restricao_init(int a, int b){
@@ -229,6 +245,8 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
 
     int i;
 
+    //printf(" Branching for %d with %d\n", a, );
+
     for (i=1; i<=n; i++){
         //printf("%d %d ", a, i);
 
@@ -248,7 +266,12 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
 
             _queue_n* aux = queue_poke(q);
             aux->restricao = restricao_copy(res);
-            aux->atual = aux->atual+1;
+
+            if (aux->atual == -1){
+                aux->atual = 2;
+            } else {
+                aux->atual = aux->atual+1;
+            }
 
             restricao_pop(res);
         }
@@ -265,12 +288,24 @@ int relax(_restricao *r, int **tsp, int n, int a){
     int total;
     _restricao *aux;
 
+    int *nao_usar = (int*) malloc (sizeof(int)*n);
+
+    for (i=0;i<n;i++){
+        nao_usar[i] = 0;
+    }
+
     total = 0;
 
     if (master_of_puppets){
         puts("restricoes:");
         restricao_print(r);
         puts("");
+    }
+
+    aux = r->next;
+    while (aux != NULL){
+        nao_usar[aux->t-1] = 1;
+        aux = aux->next;
     }
 
     for (i=0; i<n; i++){
@@ -289,7 +324,7 @@ int relax(_restricao *r, int **tsp, int n, int a){
         if (aux == NULL){
             min = 9990;
             for (j=0; j<n; j++){
-                if (tsp[i][j] < min && i != j){
+                if (tsp[i][j] < min && i != j && nao_usar[j] == 0){
                     min = tsp[i][j];
                 }
             }
@@ -312,7 +347,7 @@ int relax(_restricao *r, int **tsp, int n, int a){
 }
 
 _queue_n *queue_poke(_queue *q){
-    _queue_n *aux = q->end;
+    _queue_n *aux = q->start;
 
     return aux;
 }
@@ -339,12 +374,12 @@ int is_a_restriction(_restricao *r){
 // Detects if there is a cycle in the restrictions (There should not be one)
 int is_a_cycle(_restricao *r){
     _restricao *a;
-    _restricao *b;
+    //_restricao *b;
 
     int i, j;
     int count;
     int n = 5;
-    int first = 0;
+    //int first = 0;
 
     int *adj = (int*) malloc (sizeof(int) * n * n);
 
@@ -361,6 +396,9 @@ int is_a_cycle(_restricao *r){
     }
 
     while (a != NULL){
+        if (adj[(a->s - 1)*n + (a->t - 1)] == 1){
+            return 1;
+        }
         adj[(a->s - 1)*n + (a->t - 1)] = 1;
         a = a->next;
     }

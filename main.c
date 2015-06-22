@@ -3,7 +3,7 @@
 #include <time.h>
 
 #include "queue.h"
-#include "queue.c"
+//#include "queue.c"
 
 int main(){
     srand(time(NULL));
@@ -39,34 +39,43 @@ int main(){
     r = restricao_init(-1, -1);
 
     q = branch(r, tsp, 5, 1); 
+
+    _queue_n *pp = queue_poke(q); 
+    pp->atual = 1;
+    printf("==> Branching %d %d\n", pp->atual, pp->n);
+
     queue_print(q);
 
-    //printf("XXXXx %d ----\n", q->size);
-    //puts("end");
+    printf("========= = = =  =  %d %d\n", q->size, queue_is_empty(q));
 
-    //for (i=1; i<=n; i++){
-    while(queue_is_empty(q) != 0){
-        puts("\n--- NEW ------------------");
+    while(queue_is_empty(q) == 0){
+        puts("\n--- NEW ------------------------------------------------------------------------");
 
         int size = q->size;
         int size2 = -1;
 
         //printf("XXXXx %d ----\n", q->size);
-        if (queue_is_empty(q) != 0){
-            _queue_n *pp = queue_poke(q);
+        //if (queue_is_empty(q) != 0) {
+        _queue_n *pp = queue_poke(q); 
 
-            //printf("%d %d %d\n", pp->atual, pp->n, 666);
+        printf("==> Branching %d %d\n", pp->atual, pp->n);
 
-            _queue *q2 = branch((queue_poke(q))->restricao, tsp, 5, (queue_poke(q))->atual+1);
-            size2 = q2->size;
-            queue_remove(q);
-            q = queue_merge(q, q2);
-        }
+        _queue *q2 = branch((queue_poke(q))->restricao, tsp, n, (queue_poke(q))->atual+1);
+        size2 = q2->size;
+
+        puts(" ==== QUEUE ==== ");
+        queue_print(q2);
+        puts(" ==== QUEUE ==== ");
+
+        queue_remove(q);
+        q = queue_merge(q, q2);
+        //}
         
         printf("XXXXx %d %d %d ----\n", q->size, size2, size);
         
 
         queue_print(q);
+        //printf("========= = = =  =  %d %d\n", q->size, queue_is_empty(q));
     }
 
     return EXIT_SUCCESS;
