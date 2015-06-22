@@ -32,7 +32,7 @@ _queue_n *queue_insert(_queue *q, int n){
     node->n = n;
 
     node->limite = 9999;
-    node->atual = -1;
+    node->atual = 0;
 
     if(q->end == NULL && q->start == NULL){
         q->end = node;
@@ -88,18 +88,18 @@ void queue_print(_queue *q){
     while(aux != NULL){
         printf("%d  |", aux->n);
 
-        //_restricao *r = aux->restricao;
+        _restricao *r = aux->restricao;
         
-        //while (r != NULL){
-            //if (r->s == -1 && r->t == -1){
-                //r = r->next;
-            //}
+        while (r != NULL){
+            if (r->s == -1 && r->t == -1){
+                r = r->next;
+            }
 
-            //printf(" %d %d |", r->s, r->t);
-            //r = r->next;
-        //}
+            printf(" %d %d |", r->s, r->t);
+            r = r->next;
+        }
 
-        //puts("");
+        puts("");
 
         //restricao_print(aux->restricao);
         aux = aux->next;
@@ -109,6 +109,7 @@ void queue_print(_queue *q){
 int queue_remove(_queue *q){
     _queue_n *tmp = q->start;
     int n;
+
     n = q->start->n;
 
     q->start = q->start->next;
@@ -226,6 +227,7 @@ void restricao_insert(_restricao *res, int a, int b){
     aux->next = n;
     n->s = a;
     n->t = b;
+    n->next = NULL;
 }
 
 void restricao_pop(_restricao *res){
@@ -272,8 +274,9 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
 
             //_queue_n* aux = queue_poke(q);
             aux->restricao = restricao_copy(res);
+            //printf(">>>>>        %p %p\n", aux, aux->restricao);
 
-            _restricao *xxx = aux->restricao;
+            //_restricao *xxx = aux->restricao;
 
             //while (xxx != NULL){
                 //printf("%d %d ", xxx->s, xxx->t);
@@ -283,10 +286,11 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
             puts("");
 
             if (aux->atual == -1){
-                aux->atual = 1;
+                //aux->atual = 1;
             } else {
-                aux->atual++;
+                //aux->atual = aux->atual+1;
             }
+            aux->atual = aux->atual+1;
 
             //restricao_pop(res);
         }
@@ -376,12 +380,16 @@ _restricao* restricao_copy(_restricao *r){
     _restricao *aux = r;
     _restricao *n;
 
-    n = restricao_init(r->s, r->t);
+    if (aux == 0){
+        return NULL;
+    }
+
+    n = restricao_init(aux->s, aux->t);
     //printf("\n-----------------\n Copying | %d %d", r->s, r->t);
 
+    //while (aux->next != NULL){
     while (aux->next != NULL){
         aux = aux->next;
-        //printf(" | %d %d", r->s, r->t);
         restricao_insert(n, aux->s, aux->t);
     }
     

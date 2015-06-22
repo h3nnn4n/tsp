@@ -58,7 +58,7 @@ int main(){
         //if (queue_is_empty(q) != 0) {
         _queue_n *pp = queue_poke(q); 
 
-        printf("==> Branching for %d with %d\n", pp->atual, pp->n);
+        printf("==> Branching for %d with %d\n", pp->atual+1, pp->n);
 
         _queue *q2 = branch((queue_poke(q))->restricao, tsp, n, (queue_poke(q))->atual+1);
 
