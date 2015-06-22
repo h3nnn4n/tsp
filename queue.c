@@ -9,8 +9,8 @@ int master_of_puppets = 1;
 
 int queue_is_empty(_queue *q){
     if ( q->size == 0 )
-        return 1;
-    return 0;
+        return 0;
+    return 1;
 }
 
 _queue* queue_init(){
@@ -70,7 +70,8 @@ void restricao_print(_restricao *q){
     _restricao *aux = q;
 
     while(aux != NULL){
-        printf("%d %d\n", aux->s, aux->t);
+        if (aux->s != -1 && aux->t != -1)
+            printf("%d %d\n", aux->s, aux->t);
         aux = aux->next;
     }
 }
@@ -78,8 +79,12 @@ void restricao_print(_restricao *q){
 void queue_print(_queue *q){
     _queue_n *aux = q->start;
 
+    puts("-- QUEUE -------");
     while(aux != NULL){
-        printf("%d %p %p\n", aux->n, aux, aux->next);
+        //printf("\n%d %p %p\n-----\n", aux->n, aux, aux->next);
+        //printf("%d %p %p\n", aux->n, aux, aux->next);
+        printf("%d\n", aux->n);
+        //restricao_print(aux->restricao);
         aux = aux->next;
     }
 }
@@ -121,6 +126,13 @@ _queue_n *queue_pop(_queue *q){
 _queue* queue_merge(_queue *a, _queue *b){
     _queue *q = queue_init();
     _queue_n *aux, *auxa, *auxb;
+
+    if (a == NULL){
+        return b;
+    } else if (b == NULL) {
+        return a;
+    }
+
     int flag = 1;
 
     auxa = a->start;
@@ -150,7 +162,7 @@ _queue* queue_merge(_queue *a, _queue *b){
         }
     }
 
-    if (auxa != NULL){
+    if (auxa != NULL && aux != NULL){ 
         aux->next = auxa;
     }
 
@@ -160,11 +172,14 @@ _queue* queue_merge(_queue *a, _queue *b){
 
     _queue_n *aux3 = q->start;
 
-    while (aux3->next != NULL){
-        aux3 = aux3->next;
-    }
+    if (aux3 != NULL){
 
-    q->end = aux3;
+        while (aux3->next != NULL){
+            aux3 = aux3->next;
+        }
+
+        q->end = aux3;
+    }
 
     return q;
 }
@@ -215,18 +230,25 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
     int i;
 
     for (i=1; i<=n; i++){
+        //printf("%d %d ", a, i);
+
+        if (i == a)
+            continue;
+
         restricao_insert(res, a, i); 
         if (is_a_cycle(res)){
+            //printf(" is a cycle\n");
             restricao_pop(res);
         } else {
             if (master_of_puppets)
-                puts("-------");
+                puts("\n-------");
             //restricao_print(res);
 
             queue_insert(q, relax(res, tsp, n, a));
 
             _queue_n* aux = queue_poke(q);
             aux->restricao = restricao_copy(res);
+            aux->atual = aux->atual+1;
 
             restricao_pop(res);
         }
@@ -319,27 +341,84 @@ int is_a_cycle(_restricao *r){
     _restricao *a;
     _restricao *b;
 
+    int i, j;
+    int count;
+    int n = 5;
     int first = 0;
+
+    int *adj = (int*) malloc (sizeof(int) * n * n);
+
+    for (i=0; i<n; i++){
+        for (j=0; j<n; j++){
+            adj[i*n + j] = 0;
+        }
+    }
 
     a = r;
 
-    while (a != NULL){
-        b = a->next;
-        while(b != NULL){
-            if (( a->s == b->s && a->t == b->t) || /* vertice igual */
-                    ( a->t == a->s || b->s == b->t) || /* self  loop */
-                    ( a->s == b->t && first>0)      || /* */
-                    ( a->t == b->t )                || /* */
-                    ( a->t == b->t && a->s == b->s)){  /* redundante */
-
-                return 1;
-            }
-
-            b = b->next;
-        }
-        first++;
+    if (a->s == -1 && a->t == -1){
         a = a->next;
     }
+
+    while (a != NULL){
+        adj[(a->s - 1)*n + (a->t - 1)] = 1;
+        a = a->next;
+    }
+
+    for (i=0; i<n; i++){
+        count = 0;
+        for (j=0; j<n; j++){
+            if (adj[i*n + j] == 1){
+                count++;
+            }
+        }
+        if(count>1){
+            return 1;
+        }
+    }
+
+    for (i=0; i<n; i++){
+        count = 0;
+        for (j=0; j<n; j++){
+            if (adj[j*n + i] == 1){
+                count++;
+            }
+        }
+        if(count>1){
+            return 1;
+        }
+    }
+
+    //a = r;
+
+    //if (a->s == -1 && a->t == -1){
+        //a = a->next;
+    //}
+
+    //while (a != NULL){
+        //if (a->next != NULL){
+            //b = a->next;
+        //} else {
+            //break;
+        //}
+
+        ////printf("%p %p %d %d %d %d\n", a, b, a->s, a->t, b->s, b->t);
+        //while(b != NULL){
+            //if (( a->s == b->s && a->t == b->t) || [> vertice igual <]
+                //( a->t == a->s || b->s == b->t) || [> self  loop <]
+                //( a->s == b->t && first>0)      || [> <]
+                //( a->t == b->t )                || [> <]
+                ////( a->s == b->s )                || [> <]
+                //( a->t == b->s && a->s == b->t)){  [> loop <]
+
+                //return 1;
+            //}
+
+            //b = b->next;
+        //}
+        //first++;
+        //a = a->next;
+    //}
 
     return 0;
 }

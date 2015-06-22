@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "queue.h"
+#include "queue.c"
 
 int main(){
     srand(time(NULL));
@@ -33,45 +34,38 @@ int main(){
         puts("");
     }
 
-    q = queue_init();
-    queue_insert(q, 1);
-    queue_insert(q, 3);
-    queue_insert(q, 5);
-    queue_insert(q, 7);
-    queue_insert(q, 9);
-
-    puts("\n----------------------");
-    queue_print(q);
-    puts("\n----------------------");
-
-    _queue *a = queue_init();
-    queue_insert(a, 2);
-    queue_insert(a, 4);
-    queue_insert(a, 6);
-    queue_insert(a, 8);
-    queue_insert(a, 10);
-
-    queue_print(a);
-    q = queue_merge(q, a);
-
-    puts("\n----------------------");
-
-    queue_print(q);
-    puts("\n----------------------");
-
-    return EXIT_SUCCESS;
     _restricao *r;
+    //r = restricao_init(1, 3);
     r = restricao_init(-1, -1);
 
-    q = branch(r, tsp, 5, 2); 
+    q = branch(r, tsp, 5, 1); 
     queue_print(q);
 
-    for (i=3; i<n; i++){
+    //printf("XXXXx %d ----\n", q->size);
+    //puts("end");
+
+    //for (i=1; i<=n; i++){
+    while(queue_is_empty(q) != 0){
         puts("\n--- NEW ------------------");
 
-        _queue *q2 = branch(r, tsp, 5, i);
+        int size = q->size;
+        int size2 = -1;
 
-        q = queue_merge(q, q2);
+        //printf("XXXXx %d ----\n", q->size);
+        if (queue_is_empty(q) != 0){
+            _queue_n *pp = queue_poke(q);
+
+            //printf("%d %d %d\n", pp->atual, pp->n, 666);
+
+            _queue *q2 = branch((queue_poke(q))->restricao, tsp, 5, (queue_poke(q))->atual+1);
+            size2 = q2->size;
+            queue_remove(q);
+            q = queue_merge(q, q2);
+        }
+        
+        printf("XXXXx %d %d %d ----\n", q->size, size2, size);
+        
+
         queue_print(q);
     }
 
