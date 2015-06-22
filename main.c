@@ -68,11 +68,9 @@ int main(){
         } else {
             queue_remove(q);
             q = queue_merge(q, q2);
+            size2 = q2->size;
+            //printf("XXXXx %d %d %d ----\n", q->size, size2, size);
         }
-
-        size2 = q2->size;
-            
-        printf("XXXXx %d %d %d ----\n", q->size, size2, size);
         
         queue_print(q);
     }

@@ -86,22 +86,20 @@ void queue_print(_queue *q){
 
     puts("-- QUEUE -------");
     while(aux != NULL){
-        //printf("\n%d %p %p\n-----\n", aux->n, aux, aux->next);
-        //printf("%d %p %p\n", aux->n, aux, aux->next);
         printf("%d  |", aux->n);
 
-        _restricao *r = aux->restricao;
+        //_restricao *r = aux->restricao;
         
-        while (r != NULL){
-            if (r->s == -1 && r->t == -1){
-                r = r->next;
-            }
+        //while (r != NULL){
+            //if (r->s == -1 && r->t == -1){
+                //r = r->next;
+            //}
 
-            printf(" %d %d |", r->s, r->t);
-            r = r->next;
-        }
+            //printf(" %d %d |", r->s, r->t);
+            //r = r->next;
+        //}
 
-        puts("");
+        //puts("");
 
         //restricao_print(aux->restricao);
         aux = aux->next;
@@ -183,22 +181,23 @@ _queue* queue_merge(_queue *a, _queue *b){
 
         if (auxa != NULL && aux != NULL){ 
             aux->next = auxa;
+            q->end = a->end;
         }
 
         if (auxb != NULL){
             aux->next = auxb;
+            q->end = b->end;
         }
 
-        _queue_n *aux3 = q->start;
+        //_queue_n *aux3 = q->start;
 
-        if (aux3 != NULL){
+        //if (aux3 != NULL){
 
-            while (aux3->next != NULL){
-                aux3 = aux3->next;
-            }
-
-            q->end = aux3;
-        }
+            //while (aux3->next != NULL){
+                //aux3 = aux3->next;
+            //}
+            //q->end = aux3;
+        //}
 
 
         return q;
@@ -262,7 +261,6 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
 
         if (is_a_cycle(res)){
             //printf(" is a cycle\n");
-            restricao_pop(res);
         } else {
             if (master_of_puppets)
                 puts("\n-------");
@@ -275,19 +273,29 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
             //_queue_n* aux = queue_poke(q);
             aux->restricao = restricao_copy(res);
 
+            _restricao *xxx = aux->restricao;
+
+            //while (xxx != NULL){
+                //printf("%d %d ", xxx->s, xxx->t);
+                //xxx = xxx->next;
+            //}
+
+            puts("");
+
             if (aux->atual == -1){
                 aux->atual = 1;
             } else {
-                aux->atual = aux->atual+1;
+                aux->atual++;
             }
 
-            restricao_pop(res);
+            //restricao_pop(res);
         }
+        restricao_pop(res);
     }
 
-    //puts(" ==== QUEUE ==== ");
-    //queue_print(q);
-    //puts(" ==== QUEUE ==== ");
+    puts(" ==== QUEUE ==== ");
+    queue_print(q);
+    puts(" ==== QUEUE ==== ");
 
     return q;
 }
@@ -385,7 +393,6 @@ _restricao* restricao_copy(_restricao *r){
 int is_a_restriction(_restricao *r){
     // TODO 
     // wtf is this?
-
     return 1;
 }
 
