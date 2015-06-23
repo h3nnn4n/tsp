@@ -86,20 +86,20 @@ void queue_print(_queue *q){
 
     puts("-- QUEUE -------");
     while(aux != NULL){
-        printf("%d  |", aux->n);
+        printf("%d |", aux->n);
 
-        _restricao *r = aux->restricao;
+        //_restricao *r = aux->restricao;
         
-        while (r != NULL){
-            if (r->s == -1 && r->t == -1){
-                r = r->next;
-            }
+        //while (r != NULL){
+            //if (r->s == -1 && r->t == -1){
+                //r = r->next;
+            //}
 
-            printf(" %d %d |", r->s, r->t);
-            r = r->next;
-        }
+            //printf(" %d %d |", r->s, r->t);
+            //r = r->next;
+        //}
 
-        puts("");
+        //puts("");
 
         //restricao_print(aux->restricao);
         aux = aux->next;
@@ -276,20 +276,20 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
             aux->restricao = restricao_copy(res);
             //printf(">>>>>        %p %p\n", aux, aux->restricao);
 
-            //_restricao *xxx = aux->restricao;
+            _restricao *xxx = aux->restricao;
 
-            //while (xxx != NULL){
-                //printf("%d %d ", xxx->s, xxx->t);
-                //xxx = xxx->next;
-            //}
-
-            puts("");
-
-            if (aux->atual == -1){
-                //aux->atual = 1;
-            } else {
-                //aux->atual = aux->atual+1;
+            while (xxx != NULL){
+                //printf("%p %d %d | ", xxx, xxx->s, xxx->t);
+                xxx = xxx->next;
             }
+
+            //puts("");
+
+            //if (aux->atual == -1){
+                //aux->atual = 1;
+            //} else {
+                //aux->atual = aux->atual+1;
+            //}
             aux->atual = aux->atual+1;
 
             //restricao_pop(res);
@@ -297,9 +297,28 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
         restricao_pop(res);
     }
 
-    puts(" ==== QUEUE ==== ");
-    queue_print(q);
-    puts(" ==== QUEUE ==== ");
+    if (q->size != 0) {
+        puts(" ==== QUEUE ==== ");
+        
+        //queue_print(q);
+
+        _queue_n *aux2 = q->start;
+        printf("%p %p %p %d\n", q, q->start, q->end, q->size);
+        puts("1");
+
+        while(aux2 != NULL){
+            //puts("666");
+            printf("%d  |", aux2->n);
+            printf("\n");
+            
+            aux2 = aux2->next;
+        }
+        
+        puts("lolz");
+        puts(" ==== QUEUE ==== ");
+    } else {
+        puts("empty Queue");
+    }
 
     return q;
 }
