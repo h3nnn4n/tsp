@@ -40,6 +40,7 @@ _restricao* restricao_init(int, int);
 _restricao* restricao_copy(_restricao *r);
 void        restricao_insert(_restricao *, int, int);
 void        restricao_pop(_restricao *);
+void        restricao_print(_restricao *q);
 
 int     is_a_cycle(_restricao *);
 int     relax(_restricao *r, int **tsp, int n, int a);
