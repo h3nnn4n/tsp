@@ -28,7 +28,7 @@ typedef struct __queue_n {
 
 _queue_n *queue_poke(_queue *q);
 _queue_n *queue_pop(_queue *q);
-_queue_n *queue_insert(_queue *, int);
+_queue_n *queue_insert(_queue *, int, _restricao*, int);
 _queue*   queue_init();
 _queue*   queue_merge(_queue *a, _queue *b);
 //void    queue_insert(_queue *, int);

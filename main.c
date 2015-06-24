@@ -50,29 +50,23 @@ int main(){
     while(queue_is_empty(q) == 0){
         puts("\n--- NEW ------------------------------------------------------------------------");
 
-        int size = q->size;
-        int size2 = -1;
-
-        //printf("XXXXx %d ----\n", q->size);
-        //if (queue_is_empty(q) != 0) {
         _queue_n *pp = queue_pop(q); 
+        
+        //int size = q->size;
+        //int size2 = -1;
 
         printf("==> Branching for %d with %d\n", pp->atual+1, pp->n);
 
         _queue *q2 = branch(pp->restricao, tsp, n, pp->atual+1);
 
         if (q2->start == NULL) {
-            //puts("Imminent beating to a pulp");
-            //queue_remove(q);
+            puts("Infeasible");
+            // If the queue is empty then there is no feasible solution in this path
         } else {
-            //queue_remove(q);
-            q = queue_merge(q, q2);
             //size2 = q2->size;
+            q = queue_merge(q, q2);
             //printf("XXXXx %d %d %d ----\n", q->size, size2, size);
         }
-
-        //free(pp);
-        
         queue_print(q);
     }
 
