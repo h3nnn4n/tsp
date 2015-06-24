@@ -23,7 +23,6 @@ typedef struct __queue_n {
     int limite;
     int atual;
     _restricao *restricao;
-    _list *used, *not_used;
 } _queue_n;
 
 _queue_n *queue_poke(_queue *q);
@@ -43,7 +42,8 @@ void        restricao_pop(_restricao *);
 void        restricao_print(_restricao *q);
 
 int     is_a_cycle(_restricao *);
-int     relax(_restricao *r, int **tsp, int n, int a);
-_queue* branch(_restricao *res, int **tsp, int n, int a);
+int     relax(_restricao *r, int **tsp, int n, int a, _queue_n *feasible);
+_queue* branch(_restricao *res, int **tsp, int n, int a, _queue_n *feasible);
+_queue* bound(_queue *q, _queue_n *feasible);
 
 #endif /* __QUEUE  */

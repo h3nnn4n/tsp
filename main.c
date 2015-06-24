@@ -3,7 +3,6 @@
 #include <time.h>
 
 #include "queue.h"
-//#include "queue.c"
 
 int main(){
     srand(time(NULL));
@@ -12,6 +11,7 @@ int main(){
     int **tsp;
     int i, j;
     int n;
+    _queue_n *feasible;
 
     scanf("%d", &n);
 
@@ -34,40 +34,41 @@ int main(){
         puts("");
     }
 
+    puts("\n--- NEW ------------------------------------------------------------------------");
+    feasible = NULL;
+
     _restricao *r;
     r = restricao_init(-1, -1);
 
-    q = branch(r, tsp, 5, 1); 
+    q = branch(r, tsp, 5, 1, feasible); 
 
-    _queue_n *pp = queue_poke(q); 
-    pp->atual = 1;
-    printf("==> Branching %d %d\n", pp->atual, pp->n);
+    //_queue_n *pp = queue_poke(q); 
+
+    //pp->atual = 1;
+    //printf("==> Branching %d %d\n", pp->atual, pp->n);
 
     queue_print(q);
 
-    printf("========= = = =  =  %d %d\n", q->size, queue_is_empty(q));
-
     while(queue_is_empty(q) == 0){
         puts("\n--- NEW ------------------------------------------------------------------------");
+        feasible = NULL;
 
         _queue_n *pp = queue_pop(q); 
-        
-        //int size = q->size;
-        //int size2 = -1;
 
         printf("==> Branching for %d with %d\n", pp->atual+1, pp->n);
 
-        _queue *q2 = branch(pp->restricao, tsp, n, pp->atual+1);
+        _queue *q2 = branch(pp->restricao, tsp, n, pp->atual+1, feasible);
 
         if (q2->start == NULL) {
             puts("Infeasible");
             // If the queue is empty then there is no feasible solution in this path
         } else {
-            //size2 = q2->size;
             q = queue_merge(q, q2);
-            //printf("XXXXx %d %d %d ----\n", q->size, size2, size);
+            q = bound(q, NULL);
         }
+        
         queue_print(q);
+
     }
 
     return EXIT_SUCCESS;

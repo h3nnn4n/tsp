@@ -31,14 +31,14 @@ _queue_n *queue_insert(_queue *q, int n, _restricao *res, int atual){
 
     node->n = n;
 
-    node->limite = 9999;
-    node->atual = atual;
-    node->next = NULL;
+    node->limite    = -1;
+    node->atual     = atual;
+    node->next      = NULL;
     node->restricao = res;
 
     // Se a fila estiver vazia
     if(q->end == NULL && q->start == NULL){
-        q->end = node;
+        q->end   = node;
         q->start = node;
 
     } else {
@@ -249,7 +249,7 @@ void restricao_pop(_restricao *res){
 }
 
 // Branches the tree
-_queue* branch(_restricao *res, int **tsp, int n, int a){
+_queue* branch(_restricao *res, int **tsp, int n, int a, _queue_n *feasible){
     _queue* q = queue_init();
 
     // Do an working copy of the restriction list
@@ -258,8 +258,6 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
     int i;
 
     for (i=1; i<=n; i++){
-        //printf(" try %d %d ", a, i);
-
         // Skips an edge (i, i)
         if (i == a) {
             continue;
@@ -278,24 +276,29 @@ _queue* branch(_restricao *res, int **tsp, int n, int a){
             if (master_of_puppets)
                 puts("\n-------");
 
-            int val = relax(bkp, tsp, n, a);
+
+            int val = relax(bkp, tsp, n, a, NULL);
+
             _restricao *res_copy = restricao_copy(bkp);
-            //_queue_n *aux = queue_insert(q, val, res_copy, a);
-            queue_insert(q, val, res_copy, a);
+            _queue_n* qq = queue_insert(q, val, res_copy, a);
 
-            //aux->restricao = restricao_copy(bkp);
+            if (n == a) {
+                puts("Feasible solution found!");
+                qq->limite = val;
+                //exit(0);
+            }
 
-            //aux->atual = aux->atual+1;
         }
         restricao_pop(bkp);
     }
+
 
     return q;
 }
 
 // Given a matrix of costs and a list with restrictions
 // return the relaxation value
-int relax(_restricao *r, int **tsp, int n, int a){
+int relax(_restricao *r, int **tsp, int n, int a, _queue_n *feasible){
     int i, j;
     int min;
     int total;
@@ -309,12 +312,14 @@ int relax(_restricao *r, int **tsp, int n, int a){
 
     total = 0;
 
+    // Prints the constraints
     if (master_of_puppets){
         puts("restricoes:");
         restricao_print(r);
         puts("");
     }
 
+    // Writes a lookup table with the constraints
     aux = r->next;
     while (aux != NULL){
         nao_usar[aux->t-1] = 1;
@@ -322,9 +327,7 @@ int relax(_restricao *r, int **tsp, int n, int a){
     }
 
     for (i=0; i<n; i++){
-
         aux = r;
-
         while (aux != NULL){
             if (aux->s == i+1){
                 break;
@@ -351,10 +354,64 @@ int relax(_restricao *r, int **tsp, int n, int a){
         total += min;
     }
 
-    if (master_of_puppets)
+    if (master_of_puppets) {
         printf("\n%d\n", total);
+    }
+
+    //if (n == a){
+        //puts("Feasible solution found!");
+        //exit(1);
+        // Feasible solution found!
+
+        // If another feasible solution was found before
+        //if (feasible != NULL){
+
+        // in case the new feasible solution is the first one
+        //} else {
+            //feasible = (_queue_n*) malloc (sizeof(_queue_n));
+
+            //feasible->restricao = restricao_copy(r);
+            //feasible->n = total;
+            //feasible->atual = a;
+            //feasible->limite = total;
+            //feasible->next = NULL;
+
+            //printf("%p\n", feasible);
+            ////exit(1);
+        //}
+    //}
 
     return total;
+}
+
+_queue* bound(_queue *q, _queue_n *feasible){
+    _queue *new = NULL; 
+    _queue_n *a = q->start; 
+    _queue_n *b = NULL;
+
+    while (a != NULL){
+        if (a->limite >= 0) {
+            break;
+        }
+        a = a->next;
+    }
+
+    if (a != NULL) {
+        new = queue_init();
+        b = q->start;
+        while (b != NULL) {
+            if (b->n < a->limite){
+                queue_insert(new, b->n, b->restricao, b->atual);
+            }
+            b = b->next;
+        }
+    }
+
+    if (new != NULL) {
+        return new;
+    } else {
+        return q;
+    }
 }
 
 _queue_n *queue_poke(_queue *q){
@@ -433,7 +490,7 @@ int is_a_cycle(_restricao *r){
             }
         }
         if(count>1){
-            printf("in > 1\n");
+            printf("out > 1\n");
             return 1;
         }
     }
@@ -446,7 +503,7 @@ int is_a_cycle(_restricao *r){
             }
         }
         if(count>1){
-            printf("out > 1\n");
+            printf("in > 1\n");
             return 1;
         }
     }
