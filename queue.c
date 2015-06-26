@@ -269,7 +269,7 @@ _queue* branch(_restricao *res, int **tsp, int n, int a, _queue_n *feasible){
 
         // Check for a cycle, if there is one remove the conflict
         // otherwise get the relaxation value
-        if (is_a_cycle(bkp)){
+        if (is_a_cycle(bkp, n)){
             printf(" is a cycle\n");
             puts("\n-------");
         } else {
@@ -450,13 +450,12 @@ int is_a_restriction(_restricao *r){
 }
 
 // Detects if there is a cycle in the restrictions (There should not be one)
-int is_a_cycle(_restricao *r){
+int is_a_cycle(_restricao *r, int n){
     _restricao *a;
     _restricao *b;
 
     int i, j;
     int count;
-    int n = 5;
     int first = 0;
 
     int *adj = (int*) malloc (sizeof(int) * n * n);

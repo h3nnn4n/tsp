@@ -41,7 +41,7 @@ void        restricao_insert(_restricao *, int, int);
 void        restricao_pop(_restricao *);
 void        restricao_print(_restricao *q);
 
-int     is_a_cycle(_restricao *);
+int     is_a_cycle(_restricao *r, int n);
 int     relax(_restricao *r, int **tsp, int n, int a, _queue_n *feasible);
 _queue* branch(_restricao *res, int **tsp, int n, int a, _queue_n *feasible);
 _queue* bound(_queue *q, _queue_n *feasible);
