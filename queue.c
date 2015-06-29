@@ -4,9 +4,6 @@
 
 #include "queue.h"
 
-//int master_of_puppets = 0;
-int master_of_puppets = 1;
-
 int queue_is_empty(_queue *q){
     if ( q->size == 0 )
         return 1;
@@ -27,6 +24,7 @@ _queue_n *queue_insert(_queue *q, int n, _restricao *res, int atual){
 
     if (node == NULL){
         fprintf(stderr,"Malloc problems!\n");
+        exit(1);
     }
 
     node->n = n;
@@ -56,7 +54,7 @@ _queue_n *queue_insert(_queue *q, int n, _restricao *res, int atual){
             // elemento é menor que o elemento a ser inserido
             // ou anda até o final e insere na ultima posição
             if (aux->next != NULL){
-                while(node->n > aux->next->n && aux->next != NULL){
+                while(aux->next != NULL && node->n > aux->next->n) {
                     aux = aux->next;
                 }
             }
@@ -86,8 +84,9 @@ void restricao_print(_restricao *q){
     printf(" | ");
 
     while(aux != NULL){
-        if (aux->s != -1 && aux->t != -1)
+        if (aux->s != -1 && aux->t != -1){
             printf("%d %d | ", aux->s, aux->t);
+        }
         aux = aux->next;
     }
     puts("");
@@ -264,17 +263,22 @@ _queue* branch(_restricao *res, int **tsp, int n, int a, _queue_n *feasible){
         }
 
         // Insert a new restriction
+#ifdef CAN_I_HAZ_DEBUG
         printf("branch for | %d %d |\n", a, i);
+#endif
         restricao_insert(bkp, a, i); 
 
         // Check for a cycle, if there is one remove the conflict
         // otherwise get the relaxation value
         if (is_a_cycle(bkp, n)){
+#ifdef CAN_I_HAZ_DEBUG
             printf(" is a cycle\n");
             puts("\n-------");
+#endif
         } else {
-            if (master_of_puppets)
-                puts("\n-------");
+#ifdef CAN_I_HAZ_DEBUG
+            puts("\n-------");
+#endif
 
 
             int val = relax(bkp, tsp, n, a, NULL);
@@ -283,7 +287,7 @@ _queue* branch(_restricao *res, int **tsp, int n, int a, _queue_n *feasible){
             _queue_n* qq = queue_insert(q, val, res_copy, a);
 
             if (n == a) {
-                puts("Feasible solution found!");
+                //puts("Feasible solution found!");
                 qq->limite = val;
                 //exit(0);
             }
@@ -313,11 +317,11 @@ int relax(_restricao *r, int **tsp, int n, int a, _queue_n *feasible){
     total = 0;
 
     // Prints the constraints
-    if (master_of_puppets){
-        puts("restricoes:");
-        restricao_print(r);
-        puts("");
-    }
+#ifdef CAN_I_HAZ_DEBUG
+    puts("restricoes:");
+    restricao_print(r);
+    puts("");
+#endif
 
     // Writes a lookup table with the constraints
     aux = r->next;
@@ -343,43 +347,22 @@ int relax(_restricao *r, int **tsp, int n, int a, _queue_n *feasible){
                 }
             }
         } else {
-            if (master_of_puppets)
-                printf("Match -> %d %d: ",aux->s, aux->t);
+#ifdef CAN_I_HAZ_DEBUG
+            printf("Match -> %d %d: ",aux->s, aux->t);
+#endif
             min = tsp[aux->s-1][aux->t-1];
         }
 
-        if (master_of_puppets)
-            printf("%d \n", min);
+#ifdef CAN_I_HAZ_DEBUG
+        printf("%d \n", min);
+#endif
 
         total += min;
     }
 
-    if (master_of_puppets) {
-        printf("\n%d\n", total);
-    }
-
-    //if (n == a){
-        //puts("Feasible solution found!");
-        //exit(1);
-        // Feasible solution found!
-
-        // If another feasible solution was found before
-        //if (feasible != NULL){
-
-        // in case the new feasible solution is the first one
-        //} else {
-            //feasible = (_queue_n*) malloc (sizeof(_queue_n));
-
-            //feasible->restricao = restricao_copy(r);
-            //feasible->n = total;
-            //feasible->atual = a;
-            //feasible->limite = total;
-            //feasible->next = NULL;
-
-            //printf("%p\n", feasible);
-            ////exit(1);
-        //}
-    //}
+#ifdef CAN_I_HAZ_DEBUG
+    printf("\n%d\n", total);
+#endif
 
     return total;
 }
@@ -424,7 +407,7 @@ _restricao* restricao_copy(_restricao *r){
     _restricao *aux = r;
     _restricao *n;
 
-    if (aux == 0){
+    if (aux == NULL){
         fprintf(stderr,"NONONONONO");
         return NULL;
     }
@@ -474,7 +457,9 @@ int is_a_cycle(_restricao *r, int n){
 
     while (a != NULL){
         if (adj[(a->s - 1)*n + (a->t - 1)] == 1){
+#ifdef CAN_I_HAZ_DEBUG
             printf("repeated\n");
+#endif
             return 1;
         }
         adj[(a->s - 1)*n + (a->t - 1)] = 1;
@@ -489,7 +474,9 @@ int is_a_cycle(_restricao *r, int n){
             }
         }
         if(count>1){
+#ifdef CAN_I_HAZ_DEBUG
             printf("out > 1\n");
+#endif
             return 1;
         }
     }
@@ -502,7 +489,9 @@ int is_a_cycle(_restricao *r, int n){
             }
         }
         if(count>1){
+#ifdef CAN_I_HAZ_DEBUG
             printf("in > 1\n");
+#endif
             return 1;
         }
     }
@@ -529,7 +518,6 @@ int is_a_cycle(_restricao *r, int n){
                 //( a->s == b->s )                || [> <]
                 ( a->t == b->s && a->s == b->t)){  /* loop */
 
-                printf("Case 2\n");
                 return 1;
             }
 
