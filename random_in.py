@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 import random
+import sys
 
 def main():
-    n = 10
+    n = int(sys.argv[1])
 
     x = []
     for i in range(0,n):
