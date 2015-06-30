@@ -11,6 +11,8 @@ int main(){
     int **tsp;
     int i, j;
     int n;
+    int lower_bound;
+    int max;
     _queue_n *feasible;
 
     scanf("%d", &n);
@@ -24,8 +26,17 @@ int main(){
     for (i=0; i<n; i++){
         for (j=0; j<n; j++){
             scanf("%d", &tsp[i][j]);
+            if (i == 0 && j == 0) {
+                max = tsp[0][0];
+            } else {
+                if (tsp[i][j] > max) {
+                    max = tsp[i][j];
+                }
+            }
         }
     }
+
+    lower_bound = (max + 1) * n;
 
 #ifdef CAN_I_HAZ_DEBUG
     for (i=0; i<n; i++){
@@ -57,9 +68,11 @@ int main(){
 #endif
 
     while(queue_is_empty(q) == 0){
+
 #ifdef CAN_I_HAZ_DEBUG
         puts("\n--- NEW ------------------------------------------------------------------------");
 #endif
+
         feasible = NULL;
 
         _queue_n *pp = queue_pop(q); 
@@ -71,13 +84,15 @@ int main(){
         _queue *q2 = branch(pp->restricao, tsp, n, pp->atual+1, feasible);
 
         if (q2->start == NULL) {
+            
 #ifdef CAN_I_HAZ_DEBUG
             puts("Infeasible");
 #endif
+
             // If the queue is empty then there is no feasible solution in this path
         } else {
-            q = queue_merge(q, q2);
-            q = bound(q, NULL);
+            q = queue_merge(q, q2, &lower_bound);
+            q = bound(q, NULL, &lower_bound);
         }
         
 #ifdef CAN_I_HAZ_DEBUG

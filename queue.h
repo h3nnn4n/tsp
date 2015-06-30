@@ -29,7 +29,7 @@ _queue_n *queue_poke(_queue *q);
 _queue_n *queue_pop(_queue *q);
 _queue_n *queue_insert(_queue *, int, _restricao*, int);
 _queue*   queue_init();
-_queue*   queue_merge(_queue *a, _queue *b);
+_queue*   queue_merge(_queue *a, _queue *b, int *lower_bound);
 //void    queue_insert(_queue *, int);
 void      queue_print(_queue *);
 int       queue_remove(_queue *);
@@ -44,6 +44,6 @@ void        restricao_print(_restricao *q);
 int     is_a_cycle(_restricao *r, int n);
 int     relax(_restricao *r, int **tsp, int n, int a, _queue_n *feasible);
 _queue* branch(_restricao *res, int **tsp, int n, int a, _queue_n *feasible);
-_queue* bound(_queue *q, _queue_n *feasible);
+_queue* bound(_queue *q, _queue_n *feasible, int *lower_bound);
 
 #endif /* __QUEUE  */

@@ -85,7 +85,7 @@ void restricao_print(_restricao *q){
 
     while(aux != NULL){
         if (aux->s != -1 && aux->t != -1){
-            printf("%d %d | ", aux->s, aux->t);
+            printf("%2.d %2.d | ", aux->s, aux->t);
         }
         aux = aux->next;
     }
@@ -139,14 +139,14 @@ _queue_n *queue_pop(_queue *q){
     return tmp;
 }
 
-_queue* queue_merge(_queue *a, _queue *b){
+_queue* queue_merge(_queue *a, _queue *b, int *lower_bound){
     if (a->start == NULL){
         return b;
     } else if (b->start == NULL) {
         return a;
     } else {
         _queue *q = queue_init();
-        _queue_n *aux, *auxa, *auxb;
+        _queue_n *aux, *auxa, *auxb, *old;
 
         int flag = 1;
         q->size = a->size + b->size;
@@ -198,6 +198,15 @@ _queue* queue_merge(_queue *a, _queue *b){
             //q->end = aux3;
         //}
 
+        aux = q->start;
+
+        while (aux->next != NULL){
+            if (aux->n > *lower_bound) {
+                q->end = old;
+            }
+            old = aux;
+            aux = aux->next;
+        }  
 
         return q;
     }
@@ -264,7 +273,7 @@ _queue* branch(_restricao *res, int **tsp, int n, int a, _queue_n *feasible){
 
         // Insert a new restriction
 #ifdef CAN_I_HAZ_DEBUG
-        printf("branch for | %d %d |\n", a, i);
+        /*printf("branch for | %2.d %2.d |\n", a, i);*/
 #endif
         restricao_insert(bkp, a, i); 
 
@@ -348,7 +357,7 @@ int relax(_restricao *r, int **tsp, int n, int a, _queue_n *feasible){
             }
         } else {
 #ifdef CAN_I_HAZ_DEBUG
-            printf("Match -> %d %d: ",aux->s, aux->t);
+            printf("Match -> %2.d %2.d: ",aux->s, aux->t);
 #endif
             min = tsp[aux->s-1][aux->t-1];
         }
@@ -367,19 +376,24 @@ int relax(_restricao *r, int **tsp, int n, int a, _queue_n *feasible){
     return total;
 }
 
-_queue* bound(_queue *q, _queue_n *feasible){
+_queue* bound(_queue *q, _queue_n *feasible, int *lower_bound){
     _queue *new = NULL; 
     _queue_n *a = q->start; 
     _queue_n *b = NULL;
 
     while (a != NULL){
-        if (a->limite >= 0) {
+        if (a->limite >= 0 && a->limite < (*lower_bound)) {
+            *lower_bound = a->limite;
+            system("beep");
             break;
         }
         a = a->next;
     }
 
     if (a != NULL) {
+        puts("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+        puts("bounding");
+
         new = queue_init();
         b = q->start;
         while (b != NULL) {
@@ -430,6 +444,32 @@ int is_a_restriction(_restricao *r){
     // TODO 
     // wtf is this?
     return 1;
+}
+
+int dfs(int **g, int *visited, int s, int n){
+    int i;
+    //int *vis;
+
+    //vis = (int*) malloc (sizeof(int) * n);
+    //for (i=0; i<n; i++){
+        //vis[i] = 0;
+    //}
+
+    for (i = 0 ; i < n ; i++){
+        if (g[s][i] == 1){
+            if (visited[i] == 0){
+                visited[i] = 1;
+                if (dfs(g, visited, i, n) == 1){
+                    return 1;
+                }
+                //visited[i] = 0;
+            } else {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 // Detects if there is a cycle in the restrictions (There should not be one)
@@ -526,6 +566,51 @@ int is_a_cycle(_restricao *r, int n){
         first++;
         a = a->next;
     }
+
+    int **g;
+    int *visited;
+
+    visited = (int*) malloc (sizeof(int) * n);
+
+    g = (int**) malloc (sizeof(int*)*n);
+
+    for (i=0; i<n; i++){
+        visited[i] = 0;
+        g[i] = (int*) malloc (sizeof(int)*n);
+    }
+
+    for (i=0 ; i<n ; i++){
+        for (j=0 ; j<n ; j++){
+            g[i][j] = 0;
+        }
+    }
+    
+    a = r;
+
+    while (a != NULL) {
+        if (a->s == -1 || a->s == -1) {
+            a = a->next;
+        }
+
+        g[a->s - 1][a->t - 1] = 1;
+        a = a->next;
+    }
+
+    int dfs_result = dfs(g, visited, 0, n);
+    
+    count = 0;
+
+    for (i=0 ; i<n ; i++){
+        if (visited[i] == 1) {
+            count++;
+        }
+    }
+
+    if (dfs_result == 1 && count < n) {
+        return 1;
+    }
+
+    //printf("count = %d\tdfs_result %d\n", count, dfs_result);
 
     return 0;
 }
