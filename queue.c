@@ -384,15 +384,15 @@ _queue* bound(_queue *q, _queue_n *feasible, int *lower_bound){
     while (a != NULL){
         if (a->limite >= 0 && a->limite < (*lower_bound)) {
             *lower_bound = a->limite;
-            system("beep");
+            //system("beep");
             break;
         }
         a = a->next;
     }
 
     if (a != NULL) {
-        puts("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-        puts("bounding");
+        //puts("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+        //puts("bounding");
 
         new = queue_init();
         b = q->start;
