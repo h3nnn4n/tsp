@@ -39,7 +39,7 @@ set style line 11 lc rgb '#808080' lt 1
 set border 3 back ls 11
 set tics nomirror
 
-set xrange[5:17]
+set xrange[5:18]
 
 f(x) = a * exp(b * x + c)
 
