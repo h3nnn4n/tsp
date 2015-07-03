@@ -9,6 +9,8 @@ int main(){
     _queue *q;
     _queue *result = NULL;
 
+    unsigned long int nodes;
+
     int **tsp;
     int i, j;
     int n;
@@ -53,17 +55,18 @@ int main(){
     feasible = NULL;
     result = queue_init();
 
+    nodes = 0;
+
+   /*
+    *    CLOCK BEGINS TO TICK HERE
+    */ 
+
     time_t t = clock(); 
 
     _restricao *r;
     r = restricao_init(-1, -1);
 
     q = branch(r, tsp, 5, 1, feasible); 
-
-    //_queue_n *pp = queue_poke(q); 
-
-    //pp->atual = 1;
-    //printf("==> Branching %d %d\n", pp->atual, pp->n);
 
 #ifdef CAN_I_HAZ_DEBUG
     queue_print(q);
@@ -84,6 +87,8 @@ int main(){
 #endif
 
         _queue *q2 = branch(pp->restricao, tsp, n, pp->atual+1, feasible);
+
+        nodes += q2->size;
 
         if (q2->start == NULL) {
             
@@ -108,11 +113,17 @@ int main(){
     
     t = clock() - t;
 
+   /*
+    *    CLOCK STOPS TO TICK HERE
+    */ 
+
     result->start->next = NULL;
 
+#ifndef SILENT
     print_result(result);
+#endif
  
-    printf("%f %d\n",(double)t/CLOCKS_PER_SEC, n);
+    printf("%f %d %ld\n",(double)t/CLOCKS_PER_SEC, n, nodes);
 
     return EXIT_SUCCESS;
 }
