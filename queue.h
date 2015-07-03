@@ -30,10 +30,10 @@ _queue_n *queue_pop(_queue *q);
 _queue_n *queue_insert(_queue *, int, _restricao*, int);
 _queue*   queue_init();
 _queue*   queue_merge(_queue *a, _queue *b, int *lower_bound);
-//void    queue_insert(_queue *, int);
-void      queue_print(_queue *);
-int       queue_remove(_queue *);
-int       queue_is_empty(_queue *);
+void      queue_print(_queue *q);
+int       queue_remove(_queue *q);
+int       queue_is_empty(_queue *q);
+void      print_result(_queue *q);
 
 _restricao* restricao_init(int, int);
 _restricao* restricao_copy(_restricao *r);

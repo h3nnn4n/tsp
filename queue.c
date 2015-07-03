@@ -104,6 +104,19 @@ void queue_print(_queue *q){
     }
 }
 
+void print_result(_queue *q){
+    _queue_n *aux = q->start;
+
+    puts("\n\n-- RESULT -------\n");
+    while(aux != NULL){
+        printf("Custo: %d\nCaminho: ", aux->n);
+
+        restricao_print(aux->restricao);
+        aux = aux->next;
+    }
+    puts("\n-- END ----------\n");
+}
+
 int queue_remove(_queue *q){
     _queue_n *tmp = q->start;
     int n;

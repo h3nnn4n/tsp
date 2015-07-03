@@ -7,6 +7,7 @@
 int main(){
     srand(time(NULL));
     _queue *q;
+    _queue *result = NULL;
 
     int **tsp;
     int i, j;
@@ -50,6 +51,7 @@ int main(){
 #endif
 
     feasible = NULL;
+    result = queue_init();
 
     time_t t = clock(); 
 
@@ -89,8 +91,11 @@ int main(){
             puts("Infeasible");
 #endif
 
-            // If the queue is empty then there is no feasible solution in this path
+        // If the queue is empty then there is no feasible solution in this path
         } else {
+            result->start = q2->start;
+            result->end = q2->end;
+
             q = queue_merge(q, q2, &lower_bound);
             q = bound(q, NULL, &lower_bound);
         }
@@ -102,6 +107,10 @@ int main(){
     }
     
     t = clock() - t;
+
+    result->start->next = NULL;
+
+    print_result(result);
  
     printf("%f %d\n",(double)t/CLOCKS_PER_SEC, n);
 
