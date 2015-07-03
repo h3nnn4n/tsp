@@ -1,12 +1,12 @@
 #!/usr/bin/gnuplot
 
 set terminal pngcairo
-set output 'tsp.png'
+set output 'nodes.png'
 
 set xlabel "Size"
 set autoscale
 
-set ylabel "Time"
+set ylabel "Number of nodes"
 set title "BnB TSP"
 
 set grid
@@ -45,5 +45,5 @@ f(x) = a * exp(b * x + c)
 
 fit f(x) 'data.log'  using 2:3 via a, b, c
 
-plot    'data.log'   using 2:3 title 'out0'   with points ls 1, \
-        f(x)                                  with line   ls 2       
+plot    'data.log'   using 2:3 title 'out0'   with points ls 8, \
+        f(x)                                  with line   ls 1       
